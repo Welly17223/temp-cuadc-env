@@ -1,0 +1,8 @@
+services:
+  gz_sitl:
+    build: .
+    environment:
+      - DISPLAY
+    volumes:
+      - "/tmp.X11-unix:/tmp/.X11-unix"
+      - "$PWD:/workdir"

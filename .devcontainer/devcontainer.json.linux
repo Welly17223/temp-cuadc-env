@@ -1,0 +1,39 @@
+{
+	"name": "ghcr.io/21196/cuadc-env:latest",
+	"image": "ghcr.io/21196/cuadc-env:latest",
+	"runArgs": [
+		"--network=host"
+	],
+	"remoteUser": "user",
+	"postCreateCommand": "/usr/local/bin/MicroXRCEAgent udp4 -p 8888",
+	"workspaceFolder": "/workspace/",
+	"workspaceMount": "source=${localWorkspaceFolder}/workspace/,target=/workspace/,type=bind,consistency=delegated",
+	"mounts": [
+		"source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=consistent",
+		"source=/dev/shm/,target=/dev/shm/,type=bind,consistency=consistent"
+	],
+	"containerEnv": {
+		"DISPLAY": "${localEnv:DISPLAY}"
+	},
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"python.defaultInterpreterPath": "/usr/bin/python3",
+				"editor.formatOnSave": true,
+				"editor.formatOnPaste": true,
+				"python.formatting.provider": "autopep8",
+				"python.formatting.autopep8Args": [
+					"--max-line-length=120"
+				],
+				"python.linting.flake8Enabled": true,
+				"python.linting.flake8Args": [
+					"--max-line-length=120"
+				]
+			},
+			"extensions": [
+				"ms-python.python",
+				"redhat.vscode-xml"
+			]
+		}
+	}
+}
