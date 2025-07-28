@@ -8,7 +8,7 @@ ARG INSTALL_TYPE=desktop
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LANG=en_US.UTF-8
 
-RUN apt update -y && apt install -y sudo
+RUN apt-get update -y && apt-get install -y sudo
 
 RUN groupadd -g ${USER_GID} ${USER_NAME} && \
     useradd -m -u ${USER_UID} -g ${USER_GID} -s /bin/bash ${USER_NAME} && \
@@ -21,19 +21,40 @@ USER ${USER_NAME}
 WORKDIR /workspace
 
 # Locales (UTF-8)
-RUN sudo -E apt update -y && sudo -E apt install -y locales
+RUN sudo -E apt-get update -y && sudo -E apt-get install -y locales
 RUN sudo locale-gen en_US en_US.UTF-8
 RUN sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
 
-RUN sudo apt update && \
-    sudo apt install -y ros-${ROS_DISTRO}-ros-gz && \
-    sudo apt install -y lsb-release gnupg && \
-    sudo curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg && \
-    sudo echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null && \
-    sudo apt update && \
-    sudo apt install -y ignition-fortress
+# Add GPG keys for Gazebo and ROS
+RUN sudo curl -fsSL https://packages.osrfoundation.org/gazebo.gpg \
+    -o /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
 
-RUN sudo apt -y install wget gcc make cmake
+RUN curl -fsSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc \
+    | sudo apt-key add -
+
+# Set up Gazebo and ROS repositories
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" \
+    | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
+
+RUN echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" \
+    | sudo tee /etc/apt/sources.list.d/ros2-latest.list > /dev/null
+
+# Installation
+RUN sudo -E apt update -y && sudo -E apt install -y \
+    gz-harmonic \
+    ros-humble-ros-gzharmonic
+
+RUN sudo apt-get -y install wget gcc make cmake
+
+RUN sudo -E apt-get update && sudo -E apt-get install -y \
+    git \
+    iproute2 \
+    make \
+    python3-pip python-is-python3 \
+    tini \
+    vim
+
+RUN pip install kconfiglib pyros-genmsg jinja2 jsonschema
 
 RUN git clone https://github.com/eProsima/Micro-XRCE-DDS-Agent.git && \
     cd Micro-XRCE-DDS-Agent && \
@@ -46,5 +67,13 @@ RUN git clone https://github.com/eProsima/Micro-XRCE-DDS-Agent.git && \
     cd .. && \
     rm -rf Micro-XRCE-DDS-Agent
 
-# RUN git clone https://github.com/PX4/PX4-Autopilot.git --recursive && \
-#     bash ./PX4-Autopilot/Tools/setup/ubuntu.sh
+RUN pip install symforce
+
+RUN cd ~ && \
+    git clone -b release/1.15 --single-branch https://github.com/PX4/PX4-Autopilot.git --depth 10 && \
+    bash ./PX4-Autopilot/Tools/setup/ubuntu.sh 
+
+
+RUN cd ~/PX4-Autopilot && \
+    git submodule update --init --recursive && \
+    make px4_sitl -j6
