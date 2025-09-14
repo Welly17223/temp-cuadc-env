@@ -74,3 +74,20 @@ RUN cd ~ && \
 RUN cd ~/PX4-Autopilot && \
     git submodule update --init --recursive && \
     make px4_sitl -j6
+
+RUN export NVIM_ROOT=nvim-linux-x86_64 && \
+    curl -OL 'https://github.com/neovim/neovim/releases/download/v0.11.4/nvim-linux-x86_64.tar.gz' && \
+    tar -xf 'nvim-linux-x86_64.tar.gz' && \
+    sudo install -m 755 "${PWD}/${NVIM_ROOT}"/bin/* /bin && \
+    sudo install -d /lib/nvim/parser && \
+    sudo install -m 644 "${PWD}/${NVIM_ROOT}"/lib/nvim/parser/* /lib/nvim/parser/ && \
+    sudo cp -r "${NVIM_ROOT}/share/nvim" /usr/share
+
+RUN git clone git@github.com:Welly17223/dotfiles.git /home/user && \
+    sudo apt install stow python3.10-venv unzip ripgrep && \
+    cd /home/user && \
+    ./impl_all.sh && \
+    nvim --headless '+Lazy install' +q && \
+    nvim --headless "+Lazy! load! mason" "+MasonInstall python-lsp-server" +qa
+
+RUN sudo apt-get clean
