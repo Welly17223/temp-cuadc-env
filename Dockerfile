@@ -36,9 +36,6 @@ RUN curl -fsSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc \
 RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" \
     | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
 
-RUN echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" \
-    | sudo tee /etc/apt/sources.list.d/ros2-latest.list > /dev/null
-
 # Installation
 RUN sudo -E apt update -y && sudo -E apt install -y \
     gz-harmonic \
@@ -64,7 +61,7 @@ RUN git clone https://github.com/eProsima/Micro-XRCE-DDS-Agent.git && \
     make -j6 && \
     sudo make install -j6 && \
     sudo ldconfig /usr/local/lib/ && \
-    cd .. && \
+    cd /workspace && \
     rm -rf Micro-XRCE-DDS-Agent
 
 RUN pip install symforce
