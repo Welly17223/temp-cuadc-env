@@ -19,7 +19,7 @@ jobs:
         with:
           image_name: ${{ github.repository }}  # it will be lowercased internally
           # please Add GITHUB_TOKEN to secrets
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.TOKEN }}
           # optionally push to the Docker Hub (docker.io)
           # docker_io_token: ${{ secrets.DOCKER_IO_ACCESS_TOKEN }}  # see https://hub.docker.com/settings/security
           # customize the username to be used when pushing to the Docker Hub
