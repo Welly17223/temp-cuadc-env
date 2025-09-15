@@ -83,9 +83,9 @@ RUN export NVIM_ROOT=nvim-linux-x86_64 && \
     sudo install -m 644 "${PWD}/${NVIM_ROOT}"/lib/nvim/parser/* /lib/nvim/parser/ && \
     sudo cp -r "${NVIM_ROOT}/share/nvim" /usr/share
 
-RUN git clone git@github.com:Welly17223/dotfiles.git /home/user && \
+RUN git clone git@github.com:Welly17223/dotfiles.git /home/user/dotfiles && \
     sudo apt install stow python3.10-venv unzip ripgrep && \
-    cd /home/user && \
+    cd /home/user/dotfiles && \
     ./impl_all.sh && \
     nvim --headless '+Lazy install' +q && \
     nvim --headless "+Lazy! load! mason" "+MasonInstall python-lsp-server" +qa
