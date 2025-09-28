@@ -23,11 +23,13 @@ jobs:
             runs-on: ubuntu-latest
             dockerfile: Dockerfile.amd64
             platform: linux/amd64
+            name: linux-amd64
 
           - arch: arm64
             runs-on: ubuntu-22.04-arm
             dockerfile: Dockerfile.arm64
             platform: linux/arm64
+            name: linux-arm64
 
     steps:
       - name: Checkout repository
@@ -71,13 +73,12 @@ jobs:
         run: |
           mkdir -p ${{ runner.temp }}/digests
           digest="${{ steps.build.outputs.digest }}"
-          name=$(echo ${{ matrix.platform }} | tr "/" "-")
-          echo "${digest}" > "${{ runner.temp }}/digests/${name}"
+          echo "${digest}" > "${{ runner.temp }}/digests/${{ matrix.name }}"
 
       - name: Upload digest
         uses: actions/upload-artifact@v4
         with:
-          name: digests-${{ matrix.platform }}
+          name: digests-${{ matrix.name }}
           path: ${{ runner.temp }}/digests/*
           if-no-files-found: error
           retention-days: 1
