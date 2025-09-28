@@ -18,17 +18,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        - arch: amd64
-          # 使用標準的 x86_64 執行器
-          runs-on: ubuntu-latest
-          dockerfile: Dockerfile.amd64
-          platform: linux/amd64
+        include:
+          - arch: amd64
+            runs-on: ubuntu-latest
+            dockerfile: Dockerfile.amd64
+            platform: linux/amd64
 
-        - arch: arm64
-          # 使用免費的 arm64 執行器
-          runs-on: ubuntu-22.04-arm
-          dockerfile: Dockerfile.arm64
-          platform: linux/arm64
+          - arch: arm64
+            runs-on: ubuntu-22.04-arm
+            dockerfile: Dockerfile.arm64
+            platform: linux/arm64
 
     steps:
       - name: Checkout repository
