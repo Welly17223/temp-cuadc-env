@@ -1,4 +1,4 @@
-FROM arm64v8/ros:humble-ros-core
+FROM arm64v8/ros:humble-perception-jammy
 
 ARG USER_NAME=user
 ARG USER_UID=1000
