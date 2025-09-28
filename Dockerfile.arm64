@@ -39,7 +39,7 @@ RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/p
 # Installation
 RUN sudo -E apt update -y && sudo -E apt install -y \
     gz-harmonic \
-    ros-humble-ros-gzharmonic
+    ros-humble-ros-gz
 
 RUN sudo apt-get -y install wget gcc make cmake
 
