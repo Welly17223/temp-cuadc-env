@@ -9,7 +9,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runs-on }}
     permissions:
       contents: read
       packages: write
@@ -18,23 +18,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform:
-          - linux/amd64
-          - linux/arm64
+        - arch: amd64
+          # 使用標準的 x86_64 執行器
+          runs-on: ubuntu-latest
+          dockerfile: Dockerfile.amd64
+          platform: linux/amd64
+
+        - arch: arm64
+          # 使用免費的 arm64 執行器
+          runs-on: ubuntu-22.04-arm
+          dockerfile: Dockerfile.arm64
+          platform: linux/arm64
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Prepare
-        run: |
-          platform=${{ matrix.platform }}
-          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
-          if [ "${{ matrix.platform }}" = "linux/arm64" ]; then
-            echo "DOCKERFILE=Dockerfile.arm64" >> $GITHUB_ENV
-          else
-            echo "DOCKERFILE=Dockerfile.amd64" >> $GITHUB_ENV
-          fi
 
       - name: downcase IMAGE
         run: |
@@ -64,7 +62,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ${{ env.DOCKERFILE }}
+          file: ${{ metrix.dockerfile }}
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
